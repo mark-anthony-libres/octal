@@ -1,8 +1,12 @@
 from flask import Flask, request, render_template
-import requests
+import requests, os
 from flask_socketio import SocketIO, send
 from flask_cors import CORS
+from dotenv import load_dotenv
+load_dotenv()
 
+host = os.getenv('HOST', '127.0.0.1') 
+port = os.getenv('RECEIVER_PORT', 8000) 
 
 app = Flask(__name__)
 CORS(app)
@@ -27,4 +31,4 @@ def handle_message(msg):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000, debug=True)
+    app.run(host=host, port=port, debug=True)
