@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Browser Communication</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+    <script>
+        const receiver_socket = io.connect('http://' + document.domain + ':' + {{receiver_port}});
+        const sender_url = "{{ sender_url }}";
+
+        async function sendMessage() {
+
+            const inputValue = document.getElementById("myInput").value;
+            
+            const response = await fetch(sender_url, {
+                method: 'POST', 
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({data: inputValue})
+            });
+
+            receiver_socket.send(inputValue);
+            alert("Successfully send");
+
+            console.log(response);
+            
+        }
+    </script>
+</head>
+<body>
+    <h1>Browser-to-Browser Communication</h1>
+    <div id="messages" style="margin-bottom: 20px;"></div>
+    <input type="text" id="myInput" placeholder="Enter your message" />
+    <button onclick="sendMessage()">Send</button>
+</body>
+</html>

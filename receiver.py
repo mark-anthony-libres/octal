@@ -1,29 +1,30 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 import requests
+from flask_socketio import SocketIO, send
+from flask_cors import CORS
+
 
 app = Flask(__name__)
+CORS(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
-@app.route("/", methods=['POST'])
-def receiver():
-    data = request.get_json()
-    content = data['data']
-
-    with open("output", "w") as file:
-        file.write(content)
-
-    return { "status" : "Success", "content" : content}
-
-
-@app.route("/output", methods=['GET'])
+@app.route("/", methods=['GET'])
 def display():
 
     try:
         with open("output", "r") as file:
             content = file.read()
-        return f"<pre>{content}</pre>" 
+        return render_template('./display.html', message=content)
     except FileNotFoundError:
         return f"<h1>Error: The file output was not found.</h1>"
-   
+
+
+
+@socketio.on('message')
+def handle_message(msg):
+    print(f"Message received: {msg}")
+    send(msg, broadcast=True)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
